@@ -1,0 +1,74 @@
+# User preference: omit defense/government employers even if an individual role might qualify.
+# Match complete words after punctuation normalization, never broad fragments such as 'Sierra'.
+names:
+  - RTX
+  - Raytheon
+  - Collins Aerospace
+  - Pratt Whitney
+  - Lockheed
+  - Sikorsky
+  - Northrop Grumman
+  - General Dynamics
+  - GDIT
+  - L3Harris
+  - L3 Harris
+  - BAE Systems
+  - Huntington Ingalls
+  - HII
+  - Leidos
+  - SAIC
+  - Science Applications International
+  - CACI
+  - Booz Allen
+  - Peraton
+  - Amentum
+  - Anduril
+  - Shield AI
+  - AeroVironment
+  - Kratos
+  - Mercury Systems
+  - Sierra Nevada Corporation
+  - Sierra Space
+  - BlueHalo
+  - Boeing
+  - Palantir
+  - SpaceX
+  - Rocket Lab
+  - CesiumAstro
+  - Specter Aerospace
+  - The Aerospace Corporation
+  - Draper
+  - MITRE
+  - Battelle
+  - Sandia
+  - Lawrence Livermore
+  - Los Alamos
+  - Oak Ridge National
+  - Lawrence Berkeley National
+  - Argonne National
+  - Idaho National
+  - Pacific Northwest National
+  - Brookhaven National
+  - National Renewable Energy Laboratory
+  - National Laboratory of the Rockies
+  - SLAC National
+  - Fermilab
+  - Johns Hopkins Applied Physics
+  - Space Dynamics Laboratory
+  - NASA
+  - Jet Propulsion Laboratory
+  - Naval Research
+  - Army Research
+  - Air Force Research
+  - National Security Agency
+  - Central Intelligence Agency
+  - Federal Bureau of Investigation
+  - Department of Defense
+  - Department of Energy
+  - Department of Homeland Security
+  - Federal Reserve
+  - Cole Engineering Services
+  - Clarity Innovations
+  - Dev Technology Group
+  - AnaVation
+  - BTI360

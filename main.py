@@ -10,9 +10,10 @@ import yaml
 
 from integrations.notify import notify
 from integrations.sheets import Sheets
-from processing.dedupe import dedupe
+from processing.dedupe import canonical_url, dedupe
+from processing.eligibility import filter_jobs
 from processing.scoring import enabled, rank
-from sources import greenhouse, lever, pitt
+from sources import details, greenhouse, lever, pitt
 from sources.common import session
 
 ROOT = Path(__file__).resolve().parent
@@ -84,9 +85,17 @@ def run(args):
         LOG.warning("Poll Interval Hours is informational; change the workflow cron to change cadence")
     jobs, errors = collect(session(), boards(local, sheet_rows), args.pitt_url)
     unique = dedupe(jobs)
-    ranked = [result for job in unique if (result := rank(job, rules, settings)) is not None]
+    candidates = [job for job in unique if rank(job, rules, settings) is not None]
+    if sheets:
+        known = sheets.known_urls()
+        candidates = [job for job in candidates if canonical_url(job.url) not in known]
+    candidates = filter_jobs(candidates, {**settings, "Require Explicit CPT/OPT": False})
+    if enabled(settings, "Inspect ATS Descriptions"):
+        candidates = details.enrich(candidates)
+    screened = filter_jobs(candidates, settings)
+    ranked = [result for job in screened if (result := rank(job, rules, settings)) is not None]
     ranked.sort(key=lambda result: result.score, reverse=True)
-    LOG.info("Fetched=%d unique=%d eligible-for-review=%d", len(jobs), len(unique), len(ranked))
+    LOG.info("Fetched=%d unique=%d location/auth-screened=%d eligible-for-review=%d", len(jobs), len(unique), len(screened), len(ranked))
     if args.dry_run:
         print(json.dumps({"fetched": len(jobs), "unique": len(unique), "ranked": len(ranked),
                           "source_failures": errors, "preview": [

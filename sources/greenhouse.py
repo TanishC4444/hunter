@@ -10,7 +10,8 @@ def normalize(payload, company):
                 description=plain(row.get("content", "")),
                 # updated_at is an edit time, not a posting date. Never award freshness for it.
                 posted_at=parse_date(row.get("first_published")),
-                department=", ".join(x["name"] for x in row.get("departments", [])))
+                department=", ".join(x["name"] for x in row.get("departments", [])),
+                locations=[(row.get("location") or {}).get("name", "")])
             for row in payload["jobs"] if row.get("title") and row.get("absolute_url")]
 
 

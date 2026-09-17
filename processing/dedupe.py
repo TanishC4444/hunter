@@ -32,6 +32,9 @@ def dedupe(jobs):
                 old.description = job.description
             old.student_feed = old.student_feed or job.student_feed
             old.posted_at = old.posted_at or job.posted_at
+            old.locations = list(dict.fromkeys(old.locations + job.locations))
+            if job.sponsorship and job.sponsorship != "Other":
+                old.sponsorship = job.sponsorship
             for field in ("employment_type", "department", "work_mode", "location"):
                 if not getattr(old, field):
                     setattr(old, field, getattr(job, field))

@@ -15,7 +15,8 @@ def normalize(records, company):
                         location=categories.get("location", ""), description=plain(description),
                         posted_at=parse_date(row.get("createdAt")),
                         employment_type=categories.get("commitment", ""),
-                        department=categories.get("team", ""), work_mode=row.get("workplaceType", "")))
+                        department=categories.get("team", ""), work_mode=row.get("workplaceType", ""),
+                        locations=categories.get("allLocations") or [categories.get("location", "")]))
     return jobs
 
 

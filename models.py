@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
 
 
@@ -29,6 +29,10 @@ class Job:
     department: str = ""
     work_mode: str = ""
     student_feed: bool = False
+    locations: list[str] = field(default_factory=list)
+    sponsorship: str = ""
+    location_check: str = ""
+    f1_review: str = ""
 
 
 @dataclass

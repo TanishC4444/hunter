@@ -21,7 +21,8 @@ def normalize(records):
                         source="Pitt/Simplify", location=", ".join(row.get("locations") or []),
                         posted_at=parse_date(row.get("date_posted")),
                         description=" ".join([row.get("description") or "", degree_text]), employment_type="Internship",
-                        student_feed=True))
+                        student_feed=True, locations=row.get("locations") or [],
+                        sponsorship=row.get("sponsorship") or ""))
     return jobs
 
 

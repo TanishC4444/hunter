@@ -11,7 +11,8 @@ from processing.dedupe import canonical_url
 HEADERS = ["Company", "Role", "Location", "Work Mode", "Employment Type", "Department", "Status",
            "Posting Date", "Applied Date", "Source / Job Link", "Contact", "Relationship",
            "Referral / Direct Consideration", "Last Contact", "Next Action", "Follow-up Date", "Notes",
-           "Category", "Score", "Priority", "First Seen", "Match Reasons", "Connection Search"]
+           "Category", "Score", "Priority", "First Seen", "Match Reasons", "Connection Search",
+           "Location Check", "F-1 Review", "Show Job"]
 REQUIRED = {"Company", "Role", "Source / Job Link", "Category", "Score", "Priority", "First Seen", "Match Reasons", "Connection Search"}
 
 
@@ -32,7 +33,8 @@ def record(ranked, now=None):
             "Source / Job Link": job.url, "Notes": "Source: " + job.source,
             "Category": ", ".join(ranked.categories), "Score": ranked.score,
             "Priority": ranked.priority, "First Seen": (now or datetime.now(timezone.utc)).isoformat(),
-            "Match Reasons": "; ".join(ranked.reasons), "Connection Search": searches(job.company)["alumni"]}
+            "Match Reasons": "; ".join(ranked.reasons), "Connection Search": searches(job.company)["alumni"],
+            "Location Check": job.location_check, "F-1 Review": job.f1_review, "Show Job": "Show"}
 
 
 def prepare_append(existing, ranked_jobs):
@@ -84,6 +86,13 @@ class Sheets:
         if len(rows) == 10000:
             raise ValueError("Companies range is full; raise the configured read limit")
         return [dict(zip(rows[0], row)) for row in rows[1:]]
+
+    def known_urls(self):
+        rows = self.read("'Applications'!A:AZ")
+        if not rows or "Source / Job Link" not in rows[0]:
+            raise ValueError("Applications is missing Source / Job Link")
+        index = rows[0].index("Source / Job Link")
+        return {canonical_url(row[index]) for row in rows[1:] if len(row) > index}
 
     def append_new(self, ranked_jobs):
         # Read only current job-link values (default FORMATTED_VALUE), including manual additions.

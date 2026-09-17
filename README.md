@@ -8,7 +8,7 @@ This implementation reconstructs the Sophomore Job Hunter design from the refere
 
 1. Read the structured [Pitt/Simplify internship feed](https://github.com/SimplifyJobs/Summer2027-Internships), currently the Summer 2027 repository's `dev/.github/scripts/listings.json`.
 2. Read selected companies through the public [Lever Postings API](https://github.com/lever/postings-api) and [Greenhouse Job Board API](https://docs.greenhouse.io/job-board.html).
-3. Normalize dates, descriptions and URLs; merge duplicate URLs across sources.
+3. Normalize dates, descriptions and URLs; merge duplicate URLs across sources. Keep confirmed U.S. location options and screen explicit work-authorization restrictions.
 4. Keep plausible student opportunities across SWE, AI/ML, data, infrastructure/cloud, security, quant, product, hardware/embedded, QA/automation, and other technical programs.
 5. Rank jobs, preserving ambiguous/low-scoring opportunities by default. Remove explicit senior roles, required advanced degrees without undergraduate alternatives, and substantial experience requirements.
 6. Compare with the Applications sheet, including manually added job links, then append only unseen URLs. Existing statuses, notes, contacts and application history are never rewritten.
@@ -61,7 +61,7 @@ The existing Applications / Connections / Companies / Settings structure is supp
 Company	Role	Location	Work Mode	Employment Type	Department	Status	Posting Date	Applied Date	Source / Job Link	Contact	Relationship	Referral / Direct Consideration	Last Contact	Next Action	Follow-up Date	Notes	Category	Score	Priority	First Seen	Match Reasons	Connection Search
 ```
 
-Column order can change; the sync maps by header. Extra columns receive blank values on new rows. New jobs start with `Not Applied`; manual fields remain blank. Writes use RAW values so source text cannot become a spreadsheet formula. Unknown posting dates remain blank; First Seen records discovery time separately.
+Column order can change; the sync maps by header. The tracker also has `Location Check`, `F-1 Review`, and `Show Job` columns (X:Z) for screening. Extra columns receive blank values on new rows. New jobs start with `Not Applied`; manual fields remain blank. Writes use RAW values so source text cannot become a spreadsheet formula. Unknown posting dates remain blank; First Seen records discovery time separately.
 
 ### Connections
 
@@ -113,8 +113,27 @@ Use columns `Setting`, `Value`, `Meaning`. The following keys match the existing
 | Sophomore Bonus | 4 |
 | Undergraduate Bonus | 3 |
 | Junior Preferred Penalty | -2 |
+| U.S. Locations Only | TRUE |
+| F-1 Screening | TRUE |
+| Require Explicit CPT/OPT | FALSE |
+| Inspect ATS Descriptions | TRUE |
+| Exclude Defense/Government | TRUE |
 
 Edit category terms and weights in `config/keywords.yaml`. Word boundaries prevent `AI` from matching unrelated words like `retail`. Multiple category matches use the highest category weight, not an inflated sum.
+
+## U.S. locations and F-1 review
+
+By user preference, defense/government employers and roles are excluded independently of their stated immigration policy. `config/excluded_employers.yaml` contains editable, word-matched names and aliases, including RTX/Raytheon/Collins/Pratt & Whitney, Lockheed Martin, Northrop Grumman, major defense contractors, government-oriented space companies and national labs. Government `.gov`/`.mil` job sites and clearly defense/government titles are also excluded. This is a preference filter, not a claim that every job at these employers prohibits F-1 students. Unknown employers can still require manual review; add names to the configuration as needed.
+
+New discoveries require a confirmed U.S. location by default. International-only, unknown-country, and unqualified `Remote` postings are excluded. For a posting with multiple structured locations, retain its U.S. options and omit international options from the displayed Location. Location parsing is conservative; ambiguous city names may be excluded even if the role is actually domestic.
+
+The bot now uses the feed's citizenship/sponsorship field and available descriptions. It excludes explicit U.S.-citizen/permanent-resident/U.S.-person requirements, explicit rejection of CPT/OPT/F-1 students, and stated requirements to work without sponsorship now or in the future. It does not infer immigration eligibility from the company name. An isolated ITAR mention is not automatically treated as a citizenship restriction.
+
+`Does Not Offer Sponsorship` alone is labeled **Review: no sponsorship stated; CPT/OPT acceptance unconfirmed**. `Offers Sponsorship` is also not proof of CPT/OPT acceptance. Unknowns remain visible with a review label unless `Require Explicit CPT/OPT` is TRUE. Strict mode may show very few or zero postings because the broad feed rarely states CPT/OPT acceptance. Even an affirmative employer statement still requires confirmation of the student's own authorization with their DSO; see [ICE practical training guidance](https://www.ice.gov/sevis/practical-training).
+
+Before a new U.S. opportunity is written, supported Greenhouse/Lever URLs receive a public, individual-description lookup (four concurrent requests with timeouts). Unsupported, unavailable, or incomplete descriptions remain unconfirmed. Existing known URLs are not repeatedly fetched on every run. Other ATS pages are not scraped. These checks cannot establish that every remaining employer accepts F-1 students.
+
+Existing disqualified discoveries remain in the tracker with `Show Job = Hide`, hidden by the Applications filter, so application records are recoverable and cannot be re-added as duplicates. Clear that filter to inspect them. `F-1 Review` explains why a row was hidden or needs review. Changing a screening setting affects future discoveries; previously screened rows require a fresh review to change their labels.
 
 ## Scoring and limits
 
