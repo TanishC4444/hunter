@@ -1,0 +1,12 @@
+.venv/
+venv/
+__pycache__/
+.pytest_cache/
+*.pyc
+.env
+.env.*
+credentials*.json
+service-account*.json
+*service_account*.json
+*.pem
+.DS_Store

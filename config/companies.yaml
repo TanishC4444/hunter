@@ -1,0 +1,3 @@
+# Optional local fallback; the Companies sheet adds/overrides boards with matching ATS+identifier.
+# Example: {company: Example, ats: lever, identifier: example, enabled: true, region: global}
+companies: []

@@ -1,0 +1,48 @@
+student_terms:
+  - intern
+  - internship
+  - internships
+  - co-op
+  - coop
+  - co op
+  - summer analyst
+  - summer associate
+  - student
+  - undergraduate
+  - sophomore
+  - underclassman
+  - underclassmen
+  - exploratory program
+  - early career
+  - university program
+categories:
+  SWE:
+    weight: 5
+    terms: [software, developer, full stack, full-stack, frontend, front end, backend, back end, mobile, ios, android, web development, compiler, database]
+  AI/ML:
+    weight: 5
+    terms: [ai, artificial intelligence, machine learning, ml, genai, generative ai, llm, nlp, computer vision, deep learning, research engineer, research engineering, research intern]
+  Data:
+    weight: 4
+    terms: [data science, data scientist, data engineer, data engineering, analytics, data analyst, business intelligence]
+  Infra/Cloud:
+    weight: 4
+    terms: [cloud, platform, infrastructure, systems engineer, systems software, distributed systems, devops, site reliability, sre, developer tools, developer productivity, networking]
+  Security:
+    weight: 4
+    terms: [cybersecurity, cyber security, security engineer, security engineering, security analyst, application security, product security, security research]
+  Quant:
+    weight: 4
+    terms: [quant, quantitative, trading technology, fintech]
+  PM/Product:
+    weight: 2
+    terms: [product management, product manager, product analyst, product development, product engineer]
+  Hardware/Embedded:
+    weight: 4
+    terms: [hardware, embedded, firmware, fpga, robotics, autonomy, gpu, electrical engineering]
+  QA/Automation:
+    weight: 3
+    terms: [qa, quality engineer, test engineer, software test, test automation, automation]
+  Technical/Other:
+    weight: 2
+    terms: [technology, technical, information technology, it, engineering, solutions engineer, solutions architect, sales engineer, forward deployed, customer engineer, computer science, digital]

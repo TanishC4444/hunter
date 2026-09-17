@@ -1,0 +1,62 @@
+name: Find sophomore tech jobs
+
+'on':
+  schedule:
+    - cron: '0 */2 * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Preview public feeds without writing Sheets or sending alerts'
+        type: boolean
+        default: true
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: hunter-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: python -m pip install -r requirements-dev.txt
+      - run: python -m pytest -q
+
+  scan:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: python -m pip install -r requirements.txt
+      - name: Preview jobs
+        if: github.event_name == 'workflow_dispatch' && inputs.dry_run
+        run: python main.py --dry-run
+      - name: Sync new jobs to Sheets
+        if: github.event_name == 'schedule' || !inputs.dry_run
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          SPREADSHEET_ID: ${{ secrets.SPREADSHEET_ID }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          if [ -z "$GOOGLE_SERVICE_ACCOUNT_JSON" ] || [ -z "$SPREADSHEET_ID" ]; then
+            echo "::error::Set GOOGLE_SERVICE_ACCOUNT_JSON and SPREADSHEET_ID repository secrets; see README."
+            exit 1
+          fi
+          python main.py
